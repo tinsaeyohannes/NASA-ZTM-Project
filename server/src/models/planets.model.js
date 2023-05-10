@@ -3,7 +3,6 @@ const path = require('path');
 const parse = require('csv-parse');
 
 const habitablePlanets = [];
-const planets = [];
 
 /** NOTE */
 /* The code reads the kepler_data.csv file using fs.createReadStream(),
@@ -45,8 +44,6 @@ function loadPlanetsData() {
         reject(err);
       })
       .on('end', () => {
-        habitablePlanets.map((planet) => planets.push(planet['kepler_name']));
-        console.log(planets);
         console.log(`${habitablePlanets.length} habitable planets found`);
         resolve();
       });
