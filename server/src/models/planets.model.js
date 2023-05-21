@@ -45,7 +45,7 @@ function loadPlanetsData() {
       })
       .on('end', async () => {
         const countPlanetFound = (await getAllPlanets()).length;
-        console.log(`${countPlanetFound} habitable planets found`);
+        console.log(`${countPlanetFound} habitable planets found`); // should output 8 habitable planets found
         resolve();
       });
   });
@@ -57,7 +57,7 @@ async function getAllPlanets() {
     {
       _id: 0,
       __v: 0,
-    }
+    } // projection
   );
 }
 
