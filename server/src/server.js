@@ -22,21 +22,18 @@ mongoose.connection.on('error', (err) => {
 });
 
 async function startServer() {
-  await mongoose.connect(MONGO_URL);
+  try {
+    await mongoose.connect(MONGO_URL);
 
-  await loadPlanetsData();
+    await loadPlanetsData();
 
-  server.listen(PORT, () => {
-    console.log(`listening on port ${PORT}!`);
-  });
+    server.listen(PORT, () => {
+      console.log(`listening on port ${PORT}!`);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 startServer();
-
-//@ts-ignore
-//REVIEW -  ignore this i added this to experiment
-
-server.addListener('error', (err) => {
-  console.log(err);
-});
 
 //clustering ????
