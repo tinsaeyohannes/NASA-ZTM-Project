@@ -3,9 +3,6 @@ const planets = require('./planets.mongo');
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-//add the launches model
-const launches = new Map();
-
 //create launch object
 const launch = {
   flightNumber: 100,
@@ -20,12 +17,11 @@ const launch = {
 
 saveLaunch(launch);
 
-//get the launch object from the map
-// launches.get(100) === launch;
-
-//check if the launch exists in the map
-function existLaunchWithId(launchId) {
-  return launches.has(launchId);
+//check if the launch exists in the db
+async function existLaunchWithId(launchId) {
+  return await launchesDatabase.findOne({
+    flightNumber: launchId,
+  });
 }
 
 //prettier-ignore
@@ -81,11 +77,18 @@ async function scheduleNewLaunch(launch) {
   await saveLaunch(newLaunch);
 }
 
-function abortLaunchById(launchId) {
-  const aborted = launches.get(launchId);
-  aborted.upcoming = false;
-  aborted.success = false;
-  return aborted;
+async function abortLaunchById(launchId) {
+  const aborted = await launchesDatabase.updateOne(
+    {
+      flightNumber: launchId,
+    },
+    {
+      upcoming: false,
+      success: false,
+    }
+  );
+
+  return aborted.acknowledged === true;
 }
 
 //export the launches model
