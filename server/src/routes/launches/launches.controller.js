@@ -13,6 +13,7 @@ async function httpGetAllLaunches(req, res) {
 // POST /launches
 async function httpAddNewLaunch(req, res) {
   const launch = req.body;
+
   console.log(launch);
   if (
     !launch.mission ||
@@ -34,8 +35,8 @@ async function httpAddNewLaunch(req, res) {
   }
 
   await scheduleNewLaunch(launch);
-
-  res.status(201).json(launch);
+  console.log(launch);
+  return res.status(201).json(launch);
 }
 
 function httpAbortLaunch(req, res) {
