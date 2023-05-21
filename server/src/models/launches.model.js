@@ -28,8 +28,11 @@ function existLaunchWithId(launchId) {
   return launches.has(launchId);
 }
 
+//prettier-ignore
 async function getLatestFlightNumber() {
-  const latestLaunch = await launchesDatabase.findOne().sort('-flightNumber');
+  const latestLaunch = await launchesDatabase
+  .findOne()
+  .sort('-flightNumber');
 
   if (!latestLaunch) {
     return DEFAULT_FLIGHT_NUMBER;
@@ -44,21 +47,25 @@ async function getAllLaunches() {
 }
 
 async function saveLaunch(launch) {
-  const planet = await planets.findOne({
-    keplerName: launch.target,
-  });
+  try {
+    const planet = await planets.findOne({
+      keplerName: launch.target,
+    });
 
-  if (!planet) {
-    throw new Error('No matching Planet was Found!');
+    if (!planet) {
+      throw new Error('No matching Planet was Found!');
+    }
+
+    return await launchesDatabase.findOneAndUpdate(
+      {
+        flightNumber: launch.flightNumber,
+      },
+      launch,
+      { upsert: true }
+    );
+  } catch (error) {
+    console.error(error);
   }
-
-  return await launchesDatabase.updateOne(
-    {
-      flightNumber: launch.flightNumber,
-    },
-    launch,
-    { upsert: true }
-  );
 }
 
 async function scheduleNewLaunch(launch) {
@@ -67,8 +74,8 @@ async function scheduleNewLaunch(launch) {
   const newLaunch = Object.assign(launch, {
     success: true,
     upcoming: true,
-    flightNumber: newFlightNumber,
     customers: ['NASA', 'Zero to Mastery'],
+    flightNumber: newFlightNumber,
   });
 
   await saveLaunch(newLaunch);
