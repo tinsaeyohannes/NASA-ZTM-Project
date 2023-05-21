@@ -1,6 +1,8 @@
+//require the launches and planets databases
 const launchesDatabase = require('./launches.mongo');
 const planets = require('./planets.mongo');
 
+//default flight number
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 //create launch object
@@ -15,6 +17,7 @@ const launch = {
   success: true,
 };
 
+//save the launch
 saveLaunch(launch);
 
 //check if the launch exists in the db
@@ -24,11 +27,9 @@ async function existLaunchWithId(launchId) {
   });
 }
 
-//prettier-ignore
+//get the latest flight number from the db
 async function getLatestFlightNumber() {
-  const latestLaunch = await launchesDatabase
-  .findOne()
-  .sort('-flightNumber');
+  const latestLaunch = await launchesDatabase.findOne().sort('-flightNumber');
 
   if (!latestLaunch) {
     return DEFAULT_FLIGHT_NUMBER;
@@ -37,21 +38,25 @@ async function getLatestFlightNumber() {
   return latestLaunch.flightNumber;
 }
 
-//get all the launches
+//get all the launches from the db
 async function getAllLaunches() {
   return await launchesDatabase.find({}, { _id: 0, __v: 0 });
 }
 
+//save a launch to the db
 async function saveLaunch(launch) {
   try {
+    //find the planet associated with the launch
     const planet = await planets.findOne({
       keplerName: launch.target,
     });
 
+    //if there is no matching planet, throw an error
     if (!planet) {
       throw new Error('No matching Planet was Found!');
     }
 
+    //update the launch in the database
     return await launchesDatabase.findOneAndUpdate(
       {
         flightNumber: launch.flightNumber,
@@ -64,6 +69,7 @@ async function saveLaunch(launch) {
   }
 }
 
+//schedule a new launch, with a new flight number
 async function scheduleNewLaunch(launch) {
   const newFlightNumber = (await getLatestFlightNumber()) + 1;
 
@@ -77,6 +83,7 @@ async function scheduleNewLaunch(launch) {
   await saveLaunch(newLaunch);
 }
 
+//abort a launch by ID
 async function abortLaunchById(launchId) {
   const aborted = await launchesDatabase.updateOne(
     {
@@ -88,10 +95,11 @@ async function abortLaunchById(launchId) {
     }
   );
 
+  //return whether the operation was acknowledged
   return aborted.acknowledged === true;
 }
 
-//export the launches model
+//export the launches model so it can be used in other modules
 module.exports = {
   existLaunchWithId,
   getAllLaunches,
