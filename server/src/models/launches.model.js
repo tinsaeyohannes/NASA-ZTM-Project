@@ -9,24 +9,7 @@ const planets = require('./planets.mongo');
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-//create launch object
-
-const launch = {
-  flightNumber: 100, // flightNumber
-  mission: 'kepler Exploration X', //name
-  rocket: 'Explorer IS1', //rocket.name
-  launchDate: new Date('December 27, 2030'), //date_local
-  target: 'Kepler-1652 b', //not applicable
-  customers: ['NASA', 'SpaceX'], // payload.customers for each payload
-  upcoming: true, // upcoming
-  success: true, //success
-};
-
-//save the launch
-
 const SPACEX_API_URL = ' https://api.spacexdata.com/v4/launches/query';
-
-saveLaunch(launch);
 
 async function populateLaunches() {
   console.log('Downloading launch data...');
