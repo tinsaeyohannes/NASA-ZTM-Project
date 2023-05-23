@@ -5,7 +5,7 @@
   "main": "./src/server.js",
   "scripts": {
     "test-watch": "jest --watch  --detectOpenHandles",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "devStart": "nodemon src/server.js",
     "start": "node src/server.js",
     "cluster": "pm2 start src/server.js -i max"
