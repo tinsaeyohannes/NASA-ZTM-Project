@@ -5,16 +5,21 @@ const {
   abortLaunchById,
 } = require('../../models/launches.model');
 
+const { getPagination } = require('../../services/query');
+
 // GET /launches
 async function httpGetAllLaunches(req, res) {
-  return res.status(200).json(await getAllLaunches());
+  const { skip, limit } = getPagination(req.query);
+
+  const launches = await getAllLaunches(skip, limit);
+
+  return res.status(200).json(launches);
 }
 
 // POST /launches
 async function httpAddNewLaunch(req, res) {
   const launch = req.body;
 
-  console.log(launch);
   if (
     !launch.mission ||
     !launch.rocket ||
@@ -37,7 +42,7 @@ async function httpAddNewLaunch(req, res) {
   await scheduleNewLaunch(launch);
 
   console.log(launch);
-  
+
   return res.status(201).json(launch);
 }
 
