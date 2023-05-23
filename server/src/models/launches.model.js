@@ -52,9 +52,14 @@ async function populateLaunches() {
     },
   });
 
+  if (response.status !== 200) {
+    console.log('Problem downloading launch data!');
+    throw new Error('Launch data download failed');
+  }
+
   const launchDocs = response.data.docs;
 
-  launchDocs.forEach((launchDoc) => {
+  launchDocs.forEach(async (launchDoc) => {
     const payloads = launchDoc['payloads'];
     const customers = payloads.flatMap((payload) => {
       return payload['customers'];
@@ -64,14 +69,16 @@ async function populateLaunches() {
       flightNumber: launchDoc['flight_number'],
       mission: launchDoc['name'],
       rocket: launchDoc['rocket']['name'],
+      launchDate: launchDoc['date_local'],
       upcoming: launchDoc['upcoming'],
       success: launchDoc['success'],
       customers: customers,
     };
 
     console.log(`${launch.flightNumber} ${launch.mission}`);
+    //TODO - populate launches collection ...???
 
-    //Todo - populate launches collection ...???
+    await saveLaunch(launch);
   });
 }
 
@@ -123,18 +130,6 @@ async function getAllLaunches() {
 
 async function saveLaunch(launch) {
   try {
-    //find the planet associated with the launch
-
-    const planet = await planets.findOne({
-      keplerName: launch.target,
-    });
-
-    //if there is no matching planet, throw an error
-
-    if (!planet) {
-      throw new Error('No matching Planet was Found!');
-    }
-
     //update the launch in the database
 
     return await launchesDatabase.findOneAndUpdate(
@@ -152,6 +147,18 @@ async function saveLaunch(launch) {
 //schedule a new launch, with a new flight number
 
 async function scheduleNewLaunch(launch) {
+  //find the planet associated with the launch
+
+  const planet = await planets.findOne({
+    keplerName: launch.target,
+  });
+
+  //if there is no matching planet, throw an error
+
+  if (!planet) {
+    throw new Error('No matching Planet was Found!');
+  }
+
   const newFlightNumber = (await getLatestFlightNumber()) + 1;
 
   const newLaunch = Object.assign(launch, {
