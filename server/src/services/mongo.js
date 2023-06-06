@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
-// const MONGO_URL = 'mongodb+srv://nasa_api:iHYmYxbNEiheqiPA@nasacluster.g8ohhol.mongodb.net/nasa?retryWrites=true&w=majority';
-const MONGO_URL = 'mongodb://localhost:27017/nasa';
+const MONGO_URL =
+  'mongodb+srv://nasa_api:iHYmYxbNEiheqiPA@nasacluster.g8ohhol.mongodb.net/nasa?retryWrites=true&w=majority';
+// const MONGO_URL = 'mongodb://localhost:27017/nasa';
 
 const db = mongoose.connection;
 
